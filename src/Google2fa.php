@@ -34,13 +34,13 @@ class Google2fa extends Tool
 
         $google2fa = new G2fa();
 
-        $google2fa_url = $google2fa->getQRCodeInline(
+        $google2fa_inline_svg = $google2fa->getQRCodeInline(
             config('app.name'),
             auth()->user()->email,
             auth()->user()->user2fa->google2fa_secret
         );
 
-        $data['google2fa_url'] = $google2fa_url;
+        $data['google2fa_url'] = $this->encodeAsImageUrl($google2fa_inline_svg);
         $data['error'] = 'Secret is invalid.';
 
         return view('google2fa::register', $data);
@@ -54,16 +54,21 @@ class Google2fa extends Tool
     {
         $google2fa = new G2fa();
 
-        $google2fa_url = $google2fa->getQRCodeInline(
+        $google2fa_inline_svg = $google2fa->getQRCodeInline(
             config('app.name'),
             auth()->user()->email,
             auth()->user()->user2fa->google2fa_secret
         );
 
-        $data['google2fa_url'] = $google2fa_url;
+        $data['google2fa_url'] = $this->encodeAsImageUrl($google2fa_inline_svg);
 
         return view('google2fa::register', $data);
 
+    }
+
+    private function encodeAsImageUrl($inlineSvg)
+    {
+        return sprintf('data:image/svg+xml;base64,%s', base64_encode($inlineSvg));
     }
 
     private function isRecoveryValid($recover, $recoveryHashes)
